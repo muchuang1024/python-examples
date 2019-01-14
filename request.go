@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
 # coding=utf-8
 
 import requests
 import time
 import json
+import ast
 import os
 from selenium import webdriver
 from lxml import etree
@@ -44,9 +44,9 @@ def saveData(citiesData):
     if not os.path.exists(path):
         os.mkdir(path)
     for cityData in citiesData:
-        print(cityData, type(cityData))
-        f = open(path + cityData['i'] + '.json', 'w')
-        f.write(str(cityData))
+        f = open(path + cityData['name'] + '.json', 'w')
+        # dict to json; json to str
+        f.write(str(json.dumps(cityData)))
 
 def parseCityData(city, browser):
     apiData   = parseCityDataFromApi(city)
@@ -88,14 +88,30 @@ def parseCityDataFromDom(city, browser):
 
 def formatCityData(apiData, domData):
    # string to json 
-   data = apiData
-   lines = data['l']
+   data = {
+        'name': apiData['s'],
+        'l': [],
+   }
+   lines = apiData['l']
+   # list get index and value
    for lidx, line in enumerate(lines):
+        l  = {
+            'name': line['ln'],
+            'p': line['c'],
+            'lp': line['lp'],
+            'st': []
+        }
         for sidx, stop in enumerate(line['st']):
            # 开通的站
-           if line['st'][sidx] == '1':
-                line['st'][sidx]['lp'] = domData['st'][stop['si']]['lp'];
-        data['l'][lidx] = line
+           if line['st'][sidx]['su'] == '1':
+                lp  = domData['st'][stop['si']]['lp'];
+                st = {
+                    'name': stop['n'],
+                    'p': stop['p'],
+                    'lp': lp,
+                }
+                l['st'].append(st)
+        data["l"].append(l)
 
    return data
 
