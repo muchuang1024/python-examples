@@ -4,7 +4,7 @@
 def getP(str, separator = " "):
     p = str.split(separator) 
     return {
-        'x': p[0],
-        'y': p[1]
+        'x': int(p[0]),
+        'y': int(p[1])
     }
 

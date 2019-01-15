@@ -81,8 +81,8 @@ def parseCityDataFromDom(city, browser):
          # 站点名称坐标
          result['st'][sid] = {}
          result['st'][sid]['lp'] = {
-            'x': station.get('x'),
-            'y': station.get('y')
+            'x': int(station.get('x')),
+            'y': int(station.get('y'))
          }
 
     return result
@@ -106,7 +106,8 @@ def formatCityData(apiData, domData):
             'name': line['ln'],
             'p': p,
             'labelp': labelp,
-            'st': []
+            'st': [],
+            'la': line['la']
         }
         for sidx, stop in enumerate(line['st']):
            # 开通的站
@@ -115,7 +116,7 @@ def formatCityData(apiData, domData):
                 st = {
                     'name': stop['n'],
                     'p': utils.getP(stop['p']),
-                    'labelp': labelp,
+                    'labelp': labelp
                 }
                 l['st'].append(st)
         data["l"].append(l)
