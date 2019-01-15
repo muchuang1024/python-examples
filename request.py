@@ -6,6 +6,7 @@ import time
 import json
 import ast
 import os
+import utils
 from selenium import webdriver
 from lxml import etree
 
@@ -40,7 +41,7 @@ def parseAllCityData(cities):
     return data 
 
 def saveData(citiesData):
-    path = './city/'
+    path = './data/'
     if not os.path.exists(path):
         os.mkdir(path)
     for cityData in citiesData:
@@ -95,25 +96,32 @@ def formatCityData(apiData, domData):
    lines = apiData['l']
    # list get index and value
    for lidx, line in enumerate(lines):
+        labelp = []
+        p = []
+        for val in line['lp']:
+            labelp.append(utils.getP(val))
+        for val in line['c']:
+            p.append(utils.getP(val))
         l  = {
             'name': line['ln'],
-            'p': line['c'],
-            'lp': line['lp'],
+            'p': p,
+            'labelp': labelp,
             'st': []
         }
         for sidx, stop in enumerate(line['st']):
            # 开通的站
            if line['st'][sidx]['su'] == '1':
-                lp  = domData['st'][stop['si']]['lp'];
+                labelp  = domData['st'][stop['si']]['lp'];
                 st = {
                     'name': stop['n'],
-                    'p': stop['p'],
-                    'lp': lp,
+                    'p': utils.getP(stop['p']),
+                    'labelp': labelp,
                 }
                 l['st'].append(st)
         data["l"].append(l)
 
    return data
+
 
 def main():
     cities = fetchAllCity(PAGE_URL, HEADER)
