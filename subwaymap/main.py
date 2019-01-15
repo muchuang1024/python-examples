@@ -8,6 +8,9 @@ import ast
 import os
 import utils
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from lxml import etree
 
 PAGE_URL = 'http://map.amap.com/subway/index.html?&1100'
@@ -19,13 +22,14 @@ def fetchAllCity(url, header):
     r = requests.get(url, header)
     html = r.content
     element = etree.HTML(html)
-    options = element.xpath("//a[@class='city']")
+    options = element.xpath("//a[contains(@class, 'city')]")
     
     cities = []
     for option in options:
         city = {
             'id': option.get('id'),
-            'name': option.get('cityname')
+            'name': option.get('cityname'),
+            'text': option.text
         }
         cities.append(city)
 
@@ -65,7 +69,13 @@ def parseCityDataFromApi(city):
 
 def parseCityDataFromDom(city, browser):
     id = city['id']
-    browser.find_element_by_id(id).click()
+    # hidden 元素需要手动hover后才能执行，下面那种方式完全自动化了，因此采用下面的做法
+    # element = WebDriverWait(browser, 20).until(EC.visibility_of_element_located((By.ID, id)))
+    # element.click()
+    menu = browser.find_element_by_css_selector(".more-city")
+    el   = browser.find_element_by_id(id)
+    # hover 隐藏菜单然后点击
+    webdriver.common.action_chains.ActionChains(browser).move_to_element(menu).click(el).perform()
     # 等ajax请求加载完
     time.sleep(2)
     element = etree.HTML(browser.page_source)
@@ -126,6 +136,7 @@ def formatCityData(apiData, domData):
 
 def main():
     cities = fetchAllCity(PAGE_URL, HEADER)
+    print(cities)
     citiesData = parseAllCityData(cities)
     saveData(citiesData)
 
