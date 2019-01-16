@@ -2,3 +2,4 @@ tags
 .DS_Store
 *.pyc
 */data
+test.py
