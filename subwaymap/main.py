@@ -127,7 +127,7 @@ def formatCityData(apiData, domData):
                     'name': stop['n'],
                     'p': utils.getP(stop['p']),
                     'labelp': labelp,
-                    'strans': stop['t'] 
+                    'strans': bool(int(stop['t'])) 
                 }
                 l['st'].append(st)
         data["l"].append(l)
