@@ -5,3 +5,5 @@ requests
 numpy==1.18.0
 pandas
 openpyxl
+fake-useragent
+jieba
